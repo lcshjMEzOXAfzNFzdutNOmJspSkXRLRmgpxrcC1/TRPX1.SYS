@@ -1053,45 +1053,267 @@
             checkScroll();
         });
     </script>
-    <!-- Background Music Player -->
-<audio id="bg-music" loop>
-    <source src="https://github.com/lcshjMEzOXAfzNFzdutNOmJspSkXRLRmgpxrcC1/TRPX1.SYS/blob/main/FRIENDS.mp3?raw=true" type="audio/mpeg">
-    Your browser does not support the audio element.
-</audio>
-
-<!-- Music Controls (small and discreet) -->
-<div style="position: fixed; bottom: 80px; right: 20px; z-index: 100; background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 8px 15px; display: flex; gap: 10px; backdrop-filter: blur(10px); opacity: 0.7; hover:opacity:1; transition: opacity 0.3s;">
-    <button onclick="toggleMusic()" style="background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1.2rem;">
-        <i class="fa-solid fa-play" id="music-icon"></i>
-    </button>
-    <span style="color: var(--text-secondary); font-size: 0.8rem;">bgm</span>
+<!-- Compact Music Player - Bottom Right -->
+<div id="music-player-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    
+    <!-- COLLAPSED MODE (compact bar with play/pause) -->
+    <div id="player-collapsed" style="background: #1b1427; border: 1px solid #2a1f38; border-radius: 50px; padding: 6px 12px; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s;">
+        <!-- Logo -->
+        <img src="https://lh3.googleusercontent.com/xjWN1W8L5Prg1q9aPRRvyWlQgh9-XnZP-fjwkiZ80VrSVqxuVZUWkSYZfo0YsyRH1O9ehd4Tj0Yw97Ij=w544-h544-l90-rj" 
+             style="width: 28px; height: 28px; border-radius: 8px; border: 1px solid #7b4b9a;">
+        
+        <!-- Play/Pause Button -->
+        <button id="collapsed-play-btn" style="background: linear-gradient(135deg, #7b4b9a, #9d6bc0); border: none; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+            <i id="collapsed-play-icon" class="fa-solid fa-play" style="font-size: 0.7rem; color: white; margin-left: 2px;"></i>
+        </button>
+        
+        <!-- Up Arrow (Expand) -->
+        <div id="expand-btn" style="color: #9d6bc0; cursor: pointer; width: 24px; text-align: center;">
+            <i class="fa-solid fa-chevron-up" style="font-size: 0.9rem;"></i>
+        </div>
+    </div>
+    
+    <!-- EXPANDED MODE (full player) -->
+    <div id="player-expanded" style="width: 280px; background: #130d1c; border: 1px solid #2a1f38; border-radius: 16px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.5); overflow: hidden; margin-top: 10px; display: none;">
+        
+        <!-- Header with Logo and Title -->
+        <div style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #1b1427; border-bottom: 1px solid #2a1f38;">
+            <img src="https://lh3.googleusercontent.com/xjWN1W8L5Prg1q9aPRRvyWlQgh9-XnZP-fjwkiZ80VrSVqxuVZUWkSYZfo0YsyRH1O9ehd4Tj0Yw97Ij=w544-h544-l90-rj" 
+                 style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #7b4b9a;">
+            <span style="color: #d1c4e9; font-size: 0.85rem; font-weight: 500; flex: 1;">#voyuitwaaien (jumpstyle)</span>
+            <div id="collapse-btn" style="color: #9d6bc0; cursor: pointer; width: 24px; text-align: center;">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+        
+        <!-- Main Controls -->
+        <div style="padding: 15px;">
+            
+            <!-- Play/Pause Button -->
+            <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                <button id="expanded-play-btn" style="background: linear-gradient(135deg, #7b4b9a, #9d6bc0); border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 0 15px rgba(123,75,154,0.4);">
+                    <i id="expanded-play-icon" class="fa-solid fa-play" style="font-size: 1.5rem; color: white; margin-left: 3px;"></i>
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div style="margin-bottom: 15px;">
+                <div id="progress-bar" style="background: #2a1f38; height: 4px; border-radius: 2px; cursor: pointer; overflow: hidden;">
+                    <div id="progress-fill" style="background: linear-gradient(90deg, #7b4b9a, #9d6bc0); width: 0%; height: 100%; border-radius: 2px; transition: width 0.1s linear;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span id="expanded-current-time" style="color: #9a8bb8; font-size: 0.7rem;">0:00</span>
+                    <span id="expanded-duration" style="color: #9a8bb8; font-size: 0.7rem;">0:00</span>
+                </div>
+            </div>
+            
+            <!-- Volume Control -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="mute-btn" style="background: none; border: none; color: #9d6bc0; cursor: pointer; font-size: 1.1rem; width: 24px;">
+                    <i id="mute-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <input type="range" id="volume-slider" min="0" max="100" value="30" style="flex: 1; height: 4px; -webkit-appearance: none; background: #2a1f38; border-radius: 2px; outline: none;">
+                <span id="volume-percent" style="color: #9a8bb8; font-size: 0.7rem; min-width: 35px;">30%</span>
+            </div>
+            
+            <!-- Loop Indicator -->
+            <div style="margin-top: 12px; text-align: center;">
+                <span style="color: #7b4b9a; font-size: 0.65rem;">
+                    <i class="fa-solid fa-repeat"></i> loop
+                </span>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+    #volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #9d6bc0;
+        cursor: pointer;
+        border: none;
+    }
+    
+    #volume-slider::-webkit-slider-thumb:hover {
+        background: #7b4b9a;
+        transform: scale(1.2);
+    }
+    
+    #progress-bar:hover {
+        background: #3a2f48;
+    }
+    
+    #expanded-play-btn:hover, #collapsed-play-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(123,75,154,0.5);
+    }
+    
+    #player-collapsed:hover {
+        border-color: #9d6bc0;
+        box-shadow: 0 0 12px rgba(157,107,192,0.3);
+    }
+    
+    #expand-btn:hover, #collapse-btn:hover {
+        color: #d1c4e9;
+        transform: scale(1.1);
+    }
+</style>
+
 <script>
-    // Music control
-    const audio = document.getElementById('bg-music');
-    const icon = document.getElementById('music-icon');
+    const audio = new Audio();
+    audio.src = 'https://raw.githubusercontent.com/lcshjMEzOXAfzNFzdutNOmJspSkXRLRmgpxrcC1/MSUIC-IMG/main/voyuitwaaien%20jumpstyle%20Version%20super%20slowed.mp3';
+    audio.loop = true;
+    audio.volume = 0.3;
     
-    // Try to autoplay (browsers may block)
-    audio.volume = 0.2; // 20% volume
+    // DOM Elements
+    const collapsedMode = document.getElementById('player-collapsed');
+    const expandedMode = document.getElementById('player-expanded');
+    const expandBtn = document.getElementById('expand-btn');
+    const collapseBtn = document.getElementById('collapse-btn');
+    const collapsedPlayBtn = document.getElementById('collapsed-play-btn');
+    const collapsedPlayIcon = document.getElementById('collapsed-play-icon');
+    const expandedPlayBtn = document.getElementById('expanded-play-btn');
+    const expandedPlayIcon = document.getElementById('expanded-play-icon');
+    const progressBar = document.getElementById('progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+    const expandedCurrentTime = document.getElementById('expanded-current-time');
+    const expandedDuration = document.getElementById('expanded-duration');
+    const volumeSlider = document.getElementById('volume-slider');
+    const muteBtn = document.getElementById('mute-btn');
+    const muteIcon = document.getElementById('mute-icon');
+    const volumePercent = document.getElementById('volume-percent');
     
-    function toggleMusic() {
-        if (audio.paused) {
-            audio.play();
-            icon.className = 'fa-solid fa-pause';
-        } else {
-            audio.pause();
-            icon.className = 'fa-solid fa-play';
+    let isPlaying = false;
+    let wasPlayingBeforeMute = 0.3;
+    
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function updateDisplay() {
+        if (audio.duration && !isNaN(audio.duration)) {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = percent + '%';
+            expandedCurrentTime.textContent = formatTime(audio.currentTime);
         }
     }
     
-    // Update icon if autoplay works
-    audio.addEventListener('play', () => {
-        icon.className = 'fa-solid fa-pause';
+    audio.addEventListener('loadedmetadata', () => {
+        expandedDuration.textContent = formatTime(audio.duration);
     });
     
-    audio.addEventListener('pause', () => {
-        icon.className = 'fa-solid fa-play';
+    audio.addEventListener('timeupdate', updateDisplay);
+    
+    audio.addEventListener('ended', () => {
+        progressFill.style.width = '0%';
+        expandedCurrentTime.textContent = '0:00';
+        expandedPlayIcon.className = 'fa-solid fa-play';
+        collapsedPlayIcon.className = 'fa-solid fa-play';
+        isPlaying = false;
+    });
+    
+    function togglePlay() {
+        if (isPlaying) {
+            audio.pause();
+            expandedPlayIcon.className = 'fa-solid fa-play';
+            collapsedPlayIcon.className = 'fa-solid fa-play';
+            isPlaying = false;
+        } else {
+            audio.play().catch(() => {});
+            expandedPlayIcon.className = 'fa-solid fa-pause';
+            collapsedPlayIcon.className = 'fa-solid fa-pause';
+            isPlaying = true;
+        }
+    }
+    
+    expandedPlayBtn.addEventListener('click', togglePlay);
+    collapsedPlayBtn.addEventListener('click', togglePlay);
+    
+    progressBar.addEventListener('click', (e) => {
+        if (audio.duration) {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        }
+    });
+    
+    volumeSlider.addEventListener('input', () => {
+        const val = volumeSlider.value / 100;
+        audio.volume = val;
+        volumePercent.textContent = volumeSlider.value + '%';
+        
+        if (audio.volume === 0) {
+            muteIcon.className = 'fa-solid fa-volume-xmark';
+        } else if (audio.volume < 0.5) {
+            muteIcon.className = 'fa-solid fa-volume-low';
+        } else {
+            muteIcon.className = 'fa-solid fa-volume-high';
+        }
+    });
+    
+    muteBtn.addEventListener('click', () => {
+        if (audio.volume > 0) {
+            wasPlayingBeforeMute = audio.volume;
+            audio.volume = 0;
+            volumeSlider.value = 0;
+            volumePercent.textContent = '0%';
+            muteIcon.className = 'fa-solid fa-volume-xmark';
+        } else {
+            audio.volume = wasPlayingBeforeMute;
+            volumeSlider.value = wasPlayingBeforeMute * 100;
+            volumePercent.textContent = Math.round(wasPlayingBeforeMute * 100) + '%';
+            if (audio.volume < 0.5) {
+                muteIcon.className = 'fa-solid fa-volume-low';
+            } else {
+                muteIcon.className = 'fa-solid fa-volume-high';
+            }
+        }
+    });
+    
+    function expandPlayer() {
+        collapsedMode.style.display = 'none';
+        expandedMode.style.display = 'block';
+    }
+    
+    function collapsePlayer() {
+        collapsedMode.style.display = 'flex';
+        expandedMode.style.display = 'none';
+    }
+    
+    expandBtn.addEventListener('click', expandPlayer);
+    collapseBtn.addEventListener('click', collapsePlayer);
+    
+    document.body.addEventListener('click', function initAudio() {
+        if (!isPlaying && audio.paused) {
+            audio.play().catch(() => {});
+            expandedPlayIcon.className = 'fa-solid fa-pause';
+            collapsedPlayIcon.className = 'fa-solid fa-pause';
+            isPlaying = true;
+        }
+    }, { once: true });
+    
+    const savedVolume = localStorage.getItem('trpx1_volume');
+    if (savedVolume) {
+        audio.volume = savedVolume / 100;
+        volumeSlider.value = savedVolume;
+        volumePercent.textContent = savedVolume + '%';
+        if (audio.volume === 0) {
+            muteIcon.className = 'fa-solid fa-volume-xmark';
+        } else if (audio.volume < 0.5) {
+            muteIcon.className = 'fa-solid fa-volume-low';
+        } else {
+            muteIcon.className = 'fa-solid fa-volume-high';
+        }
+    }
+    
+    volumeSlider.addEventListener('change', () => {
+        localStorage.setItem('trpx1_volume', volumeSlider.value);
     });
 </script>
 </body>
