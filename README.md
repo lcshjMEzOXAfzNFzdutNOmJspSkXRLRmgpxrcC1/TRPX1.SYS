@@ -32,7 +32,7 @@ This is the official website for **TRPX1** — a personal security research coll
 ## 🚀 Live Site
 
 The site is hosted via GitHub Pages:
-https://lcshjmezoxafznfzdutnomjspskxrlrmgpxrcc1.github.io/website/
+https://lcshjmezoxafznfzdutnomjspskxrlrmgpxrcc1.github.io/TRPX1.SYS/
 
 ---
 
