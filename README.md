@@ -30,4 +30,4 @@ The site features:
 
 ## 🚀 Live Site
 
-The site is hosted via GitHub Pages at:("https://lcshjmezoxafznfzdutnomjspskxrlrmgpxrcc1.github.io/TRPX1.SYS/")
+The site is hosted via GitHub Pages at:  https://lcshjmezoxafznfzdutnomjspskxrlrmgpxrcc1.github.io/TRPX1.SYS/
